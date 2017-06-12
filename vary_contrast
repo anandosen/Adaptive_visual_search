@@ -1,0 +1,50 @@
+#!/bin/csh
+#SPECT-CT: SPIE 2014, SNM 2014
+
+set cont = ${argv[1]}
+set i = 1
+if (${cont} == 1.5) then
+	set j = 1
+else
+	
+	set j = 0
+endif 
+
+set initj = ${j}
+set maxcont = `echo ${cont}|awk '{print 2 + $1}'`
+set mincont = ${cont}
+set datfils = `awk '{print($1);}' temppar`
+rm -f par2
+set n = $#datfils
+while ($i <= $n)
+
+	set fil = ${datfils[$i]}
+	if ($j == 2) then
+		set cont=${cont}.0
+		set j = 0
+	endif
+	
+	# Creating filenames with variable contrast
+	set newfil = `echo ${fil}|awk '{print($1);}'| sed "s/cont_[0-9].[0-9]_s/cont_${cont}_s/;" | sed "s/cont_[0-9].[0-9]_c/cont_${cont}_c/;"`
+	
+	
+	echo ${newfil} >>! par2
+	set cont = `echo ${cont}|awk '{print 0.5 + $1}'`
+	@ i ++
+	@ j ++
+	if (${cont} == ${maxcont}) then
+		set cont = ${mincont}
+		set j = ${initj}
+	endif
+	
+	
+end
+ 
+
+rm -f temppar
+mv par2 temppar
+
+
+
+	
+

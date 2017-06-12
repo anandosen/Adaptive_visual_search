@@ -1,0 +1,100 @@
+#!/bin/csh
+set CONT = 1.5
+#set ITR = 6
+#set BLR = 0.425
+set currdir = /galveston3/adaptive_vs/freature_list
+set nfils = 100
+set ntrfils = 50
+set dim = 128
+
+foreach ITR ( 2 6 )
+
+	foreach BLR (0.000 0.425 0.850 1.274 1.699)
+
+		set imgldir = /galveston3/prostate_spect_full_study/data_2d_slices/prostate-study_lesion_1_noise_1_cont_${CONT}_sigma_${BLR}_iter_${ITR}_a1d1/byte
+		set imgnldir = /galveston3/prostate_spect_full_study/data_2d_slices/prostate-study_lesion_0_noise_1_cont_nap_sigma_${BLR}_iter_${ITR}_a1d1/byte
+		set imgldirnf = /galveston2/prostate_spect_full_study/data_2d_slices/prostate-study_lesion_1_noise_0_cont_${CONT}_sigma_${BLR}_iter_${ITR}_a1d1/byte
+		set imgnldirnf = /galveston2/prostate_spect_full_study/data_2d_slices/prostate-study_lesion_0_noise_0_cont_nap_sigma_${BLR}_iter_${ITR}_a1d1/byte
+
+		foreach typ (study train)
+		      ls ${imgnldir}/phan_* >! _parfil.txt #listing files to _parfil.txt
+		      ls ${imgnldirnf}/phan_* >> _parfil.txt # same
+		      ls ${imgldir}/phan_* >> _parfil.txt
+		      ls ${imgldirnf}/phan_* >> _parfil.txt
+
+			./comb_cont.csh ${ITR} ${BLR} ${typ}
+			mv temppar _parfil.txt
+	
+		     	# redistributes files by presence/absence of lesion/noise into temporary files
+		      awk '{print($1);}' _parfil.txt | grep -v '_lesion_0' | grep -v '_counts_nan_' >! _tmpfils.txt
+		      awk '{print($1);}' _parfil.txt | grep '_lesion_0' | grep -v '_counts_nan_' >! _tmpfilsNo.txt
+		      awk '{print($1);}' _parfil.txt | grep -v '_lesion_0' | grep '_counts_nan_' >! _tmpfilsNF.txt
+		      awk '{print($1);}' _parfil.txt | grep '_lesion_0' | grep '_counts_nan_' >! _tmpfilsNoNF.txt
+
+		      sed 's/galveston2/galveston3/' _tmpfils.txt > _tmpfils2.txt
+		      mv _tmpfils2.txt _tmpfils.txt
+		      sed 's/galveston2/galveston3/' _tmpfilsNo.txt > _tmpfilsNo2.txt
+		      mv _tmpfilsNo2.txt _tmpfilsNo.txt
+
+		      sed "s/[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]/ & /;" _tmpfils.txt | awk '{print($2);}' >! _ord.txt
+
+		      sort _ord.txt >! _ord2.txt; set locc = `cat _ord2.txt`; #rm -f _ord.txt _ord2.txt #` ` means writes the contents of the file into an array locc
+		      rm -f _fils.txt _filsNo.txt _filsNF.txt _filsNoNF.txt 
+			set t0; set t1
+		      foreach lc ( ${locc} )
+			set t1 = ( ${t1} 1 )
+			set t0 = ( ${t0} 0 )
+			grep ${lc} _tmpfils.txt >>! _fils.txt
+			grep ${lc} _tmpfilsNo.txt >>! _filsNo.txt
+			grep ${lc} _tmpfilsNF.txt >>! _filsNF.txt
+			grep ${lc} _tmpfilsNoNF.txt >>! _filsNoNF.txt
+		      end
+			cat _filsNo.txt >> _fils.txt
+			mv _fils.txt ${typ}parfil
+			cat _filsNoNF.txt _filsNoNF.txt >! __tmp
+			rm -f _filsNoNF.txt
+			mv __tmp ${typ}parfil_nf
+		end
+		./getAvgTgt_ms.csh trainparfil ${dim} b
+
+		#cd imgldir
+		#ls $PWD/{*} >! ${currdir}/parfil
+
+		#cd imgnldir
+		#ls $PWD/{*} >> ${currdir}/parfil
+
+		cd currdir
+		set c = 1
+		while ( -f featset_$c )
+			rm featset_$c
+			@ c ++
+		end 
+
+		echo ".run mk_feat_list.pro" >! _tmptest.pro
+		echo "mk_feat_list, 'trainparfil', ${ntrfils}, ${dim}" >> _tmptest.pro
+		echo ".run training.pro" >> _tmptest.pro
+		echo "training, 'trainparfil', ${ntrfils}, ${dim}" >> _tmptest.pro
+		echo ".run testing.pro" >> _tmptest.pro
+		echo "testing, 'studyparfil', ${nfils}, ${dim}" >> _tmptest.pro
+		idl < _tmptest.pro
+
+		set c = 1
+		rm -f lroc_indiv.txt
+		while ( -f featset_$c )
+			./empiricalLROC -i featset_$c -rcl 5 -x >>! lroc_indiv.txt
+			@ c ++
+		end 
+
+		echo ".run avg_lroc.pro" >! _tmptest.pro
+		echo "avg_lroc, 'lroc_indiv.txt' " >> _tmptest.pro
+
+		idl < _tmptest.pro
+		set lroc_final = `awk '{print($1);}' lroc_temp`
+
+		echo $ITR $BLR $lroc_final >>! lroc_areas.txt
+
+	end
+
+end
+#rm -f lroctemp
+

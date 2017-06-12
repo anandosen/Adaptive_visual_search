@@ -1,0 +1,7 @@
+
+output: featset_1
+    Wilcoxon AreaLROC= 0.842752
+    Correct localizations= 223/225
+    pcl= 0.991111
+    StdErr-area= 0.015785
+    StdErr-pcl= 0.006257

@@ -1,0 +1,77 @@
+
+output: featset_1
+    Wilcoxon AreaLROC= 0.835200
+    Correct localizations= 48/50
+    pcl= 0.960000
+    StdErr-area= 0.041235
+    StdErr-pcl= 0.027713
+
+output: featset_2
+    Wilcoxon AreaLROC= 0.806267
+    Correct localizations= 47/50
+    pcl= 0.940000
+    StdErr-area= 0.045581
+    StdErr-pcl= 0.033586
+
+output: featset_3
+    Wilcoxon AreaLROC= 0.837867
+    Correct localizations= 47/50
+    pcl= 0.940000
+    StdErr-area= 0.045739
+    StdErr-pcl= 0.033586
+
+output: featset_4
+    Wilcoxon AreaLROC= 0.835867
+    Correct localizations= 47/50
+    pcl= 0.940000
+    StdErr-area= 0.045628
+    StdErr-pcl= 0.033586
+
+output: featset_5
+    Wilcoxon AreaLROC= 0.844800
+    Correct localizations= 48/50
+    pcl= 0.960000
+    StdErr-area= 0.040180
+    StdErr-pcl= 0.027713
+
+output: featset_6
+    Wilcoxon AreaLROC= 0.847067
+    Correct localizations= 48/50
+    pcl= 0.960000
+    StdErr-area= 0.040240
+    StdErr-pcl= 0.027713
+
+output: featset_7
+    Wilcoxon AreaLROC= 0.806933
+    Correct localizations= 47/50
+    pcl= 0.940000
+    StdErr-area= 0.045602
+    StdErr-pcl= 0.033586
+
+output: featset_8
+    Wilcoxon AreaLROC= 0.845067
+    Correct localizations= 48/50
+    pcl= 0.960000
+    StdErr-area= 0.040186
+    StdErr-pcl= 0.027713
+
+output: featset_9
+    Wilcoxon AreaLROC= 0.847067
+    Correct localizations= 48/50
+    pcl= 0.960000
+    StdErr-area= 0.040261
+    StdErr-pcl= 0.027713
+
+output: featset_10
+    Wilcoxon AreaLROC= 0.771867
+    Correct localizations= 46/50
+    pcl= 0.920000
+    StdErr-area= 0.049795
+    StdErr-pcl= 0.038367
+
+output: featset_11
+    Wilcoxon AreaLROC= 0.823733
+    Correct localizations= 47/50
+    pcl= 0.940000
+    StdErr-area= 0.045229
+    StdErr-pcl= 0.033586
